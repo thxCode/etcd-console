@@ -1,0 +1,11 @@
+.git
+.gitignore
+
+/.idea
+/vendor
+/.build
+/hooks
+LICENSE
+VERSION
+
+.DS_Store
