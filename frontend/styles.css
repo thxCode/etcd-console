@@ -1,0 +1,136 @@
+/* You can add global styles to this file, and also import other style files */
+
+
+/*@import '~@angular2-material/core/theming/prebuilt/deeppurple-amber.css';*/
+
+html * {
+    font-family: 'Open Sans', sans-serif;
+}
+
+.etcd-group {
+    padding: 30px;
+}
+
+.card {
+    min-height: 250px;
+    margin-top: 50%;
+    top: -125px;
+}
+
+.card-info {
+    color: #000;
+    font-family: 'Inconsolata', monospace;
+    font-weight: 300;
+}
+
+.card-info_title {
+    font-size: 15px;
+}
+
+.card-info_value {
+    font-size: 13px;
+    margin-left: 1em;
+}
+
+.card-error {
+    text-align: center;
+    font-size: 12px;
+    color: #FF1744;
+    font-family: 'Inconsolata', monospace;
+    font-weight: 300;
+}
+
+.mdTabLabel {
+    /*TODO: adjust mdTabLabel size by class*/
+    text-align: center;
+    /*decrease width of mat-tab labels*/
+    min-width: 50px !important;
+}
+
+body {
+    margin: 0px;
+    font-family: 'Roboto', Helvetica, sans-serif;
+    font-weight: 300;
+    color: #000
+}
+
+.inner {
+    /*max-width: 1170px;*/
+    margin-left: 0px;
+    margin-right: auto;
+    padding: 0 5px
+}
+
+.inner::after {
+    clear: both;
+    content: "";
+    display: table
+}
+
+@media (max-width: 768px) {
+    .card {
+        margin-top: 0 !important ;
+        top: 0 !important ;
+    }
+}
+
+
+@media screen and (min-width: 768px) {
+    .inner {
+        padding: 0 10px
+    }
+}
+
+section {
+    padding: 10px 0
+}
+
+@media screen and (min-width: 768px) {
+    section {
+        padding: 10px 0
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .block.half {
+        margin-top: 0
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .block-copy.half {
+        float: left;
+        display: block;
+        margin-right: 4.34783%;
+        width: 47.82609%
+    }
+    .block-copy.half:last-child {
+        margin-right: 0
+    }
+}
+
+.block-copy p {
+    margin-top: 15px;
+    line-height: 1.75rem;
+    color: #000
+}
+
+@media screen and (min-width: 768px) {
+    section.more-about .inner {
+        display: table;
+        max-width: 1100px
+    }
+}
+
+@media screen and (min-width: 768px) {
+    section.more-about .inner .block-copy {
+        float: left;
+        display: block;
+        margin-right: 4.34783%;
+        width: 47.82609%;
+        padding-right: 35px
+    }
+    section.more-about .inner .block-copy:last-child {
+        margin-right: 0
+    }
+}

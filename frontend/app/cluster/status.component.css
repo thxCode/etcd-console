@@ -1,0 +1,30 @@
+.circle_basic {
+    fill: #B3E5FC;
+}
+
+.circle_stopped {
+    fill: #F44336;
+}
+
+.circle_follower {
+    fill: #40C4FF;
+}
+
+.circle_leader {
+    fill: #2E7D32;
+}
+
+.member_stopped {
+    font-weight: bold;
+    color: #FF1744;
+}
+
+.member_follower {
+    font-weight: bold;
+    color: #3F51B5;
+}
+
+.member_leader {
+    font-weight: bold;
+    color: #388E3C;
+}

@@ -1,0 +1,71 @@
+<div class="etcd-group">
+    <div class="inner">
+        <div class="block block-copy half">
+            <mat-card class="card client-box">
+                <mat-tab-group [(selectedIndex)]="selectedTab">
+                    <mat-tab>
+                        <ng-template matTabLabel><b>{{localService.core.CLIENT_OP_WRITE}}</b></ng-template>
+                        <br/>
+                        <div class="form-container">
+                            <mat-form-field>
+                                <input matInput [placeholder]="localService.core.CLIENT_INPUT_PLACEHOLDER_KEY" [(ngModel)]="inputKey">
+                            </mat-form-field>
+                            <mat-form-field>
+                                <textarea matInput [placeholder]="localService.core.CLIENT_INPUT_PLACEHOLDER_VALUE" [(ngModel)]="inputValue"></textarea>
+                            </mat-form-field>
+                        </div>
+                        <button class="client-box_submit" mat-raised-button color="primary" (click)="processClientRequest('write');">{{localService.core.CLIENT_OP_SUBMIT}}</button>
+                    </mat-tab>
+                    <mat-tab>
+                        <ng-template matTabLabel><b>{{localService.core.CLIENT_OP_READ}}</b></ng-template>
+                        <br/>
+                        <div class="form-container">
+                            <mat-form-field>
+                                <input matInput [placeholder]="localService.core.CLIENT_INPUT_PLACEHOLDER_KEY" [(ngModel)]="inputKey">
+                            </mat-form-field>
+                            <mat-checkbox [(ngModel)]="inputPrefix">
+                                <span class="checkbox">{{localService.core.CLIENT_OP_CHECKBOX_PREFIX}}</span>
+                            </mat-checkbox>
+                        </div>
+                        <button class="client-box_submit" mat-raised-button color="primary" (click)="processClientRequest('read');">{{localService.core.CLIENT_OP_SUBMIT}}</button>
+                    </mat-tab>
+                    <mat-tab>
+                        <ng-template matTabLabel><b>{{localService.core.CLIENT_OP_REMOVE}}</b></ng-template>
+                        <br/>
+                        <div class="form-container">
+                            <mat-form-field>
+                                <input matInput [placeholder]="localService.core.CLIENT_INPUT_PLACEHOLDER_KEY" [(ngModel)]="inputKey">
+                            </mat-form-field>
+                            <mat-checkbox [(ngModel)]="inputPrefix">
+                                <span class="checkbox">{{localService.core.CLIENT_OP_CHECKBOX_PREFIX}}</span>
+                            </mat-checkbox>
+                        </div>
+                        <button class="client-box_submit" mat-raised-button color="primary" (click)="processClientRequest('remove');">{{localService.core.CLIENT_OP_SUBMIT}}</button>
+                    </mat-tab>
+                </mat-tab-group>
+            </mat-card>
+        </div>
+        <div class="block block-copy half">
+            <mat-card id="log-container">
+                <mat-card-header>
+                    <mat-card-title>{{localService.core.CLIENT_LOG}}</mat-card-title>
+                </mat-card-header>
+                <mat-card-content class="log-box">
+                    <div id="wrapper" class="log-box_scroller_wrapper">
+                        <div id="iscroller" class="log-box_scroller">
+                            <div class="log-box_scroller_item" *ngFor="let logLine of this.logOutputLines; trackBy:trackByLineIndex">
+                                <span *ngIf="logLine.logLevel == 0" class="log-output-prefix-success">{{ logLine.prefix }}</span>
+                                <span *ngIf="logLine.logLevel == 1" class="log-output-prefix-warn">{{ logLine.prefix }}</span>
+                                <span *ngIf="logLine.logLevel == 2" class="log-output-prefix-error">{{ logLine.prefix }}</span>
+                                <span class="log-output">{{ logLine.text }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions>
+                    <button mat-raised-button class="log-box_clean" color="warn" (click)="cleanLogs();">{{localService.core.CLIENT_LOG_CLEAN}}</button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+    </div>
+</div>

@@ -56,7 +56,7 @@ func Start(listenURL string, test bool, apiVersion int, endpoints []string) (*Se
 			embedCfg := embed.NewConfig()
 			embedCfg.Dir = fmt.Sprintf("/tmp/etcd_console_%d.etcd", time.Now().Unix())
 			embedCfg.ForceNewCluster = true
-			embedCfg.Debug = true
+			embedCfg.LogPkgLevels="etcdserver=WARNING,security=WARNING,raft=WARNING"
 
 			embedEtcd, err := embed.StartEtcd(embedCfg)
 			if err != nil {

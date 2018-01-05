@@ -34,14 +34,14 @@ func main() {
 			)))
 
 	flag.StringVar(&listenURL, "listen-url", "0.0.0.0:8080", "Specify listening URL.")
-	flag.BoolVar(&test, "test", false, "Specify using embedding etcd.")
+	flag.BoolVar(&test, "test", true, "Specify using embedding etcd.")
 	flag.IntVar(&apiVersion, "api-version", 3, "Specify the api version of etcd.")
 	flag.StringVar(&inEndpoints, "endpoints", "", "Specify using endpoints of endpoints, if on testing, it will be setting by http://localhost:2379.")
 	flag.Parse()
 
 	if len(inEndpoints) == 0 || inEndpoints == "" {
 		inEndpoints = os.Getenv(endpointsEnv)
-		if inEndpoints == "" {
+		if !test && inEndpoints == "" {
 			log.Fatal("cannot get etcd endpoints.")
 			os.Exit(1)
 		}

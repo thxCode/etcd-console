@@ -1,0 +1,34 @@
+{
+    "/health": {
+        "target": "http://0.0.0.0:8080",
+        "secure": "false"
+    },
+    "/cluster/status": {
+        "target": "http://0.0.0.0:8080",
+        "secure": "false"
+    },
+    "/cluster/backup": {
+        "target": "http://0.0.0.0:8080",
+        "secure": "false"
+    },
+    "/client/get": {
+        "target": "http://0.0.0.0:8080",
+        "secure": "false"
+    },
+    "/client/ls": {
+        "target": "http://0.0.0.0:8080",
+        "secure": "false"
+    },
+    "/client/set": {
+        "target": "http://0.0.0.0:8080",
+        "secure": "false"
+    },
+    "/client/lease": {
+        "target": "http://0.0.0.0:8080",
+        "secure": "false"
+    },
+    "/client/remove": {
+        "target": "http://0.0.0.0:8080",
+        "secure": "false"
+    }
+}

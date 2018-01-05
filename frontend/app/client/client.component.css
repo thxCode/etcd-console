@@ -1,0 +1,86 @@
+.client-box {
+    min-height: 350px;
+    top: -175px;
+}
+
+.client-box_submit {
+    float: right;
+    margin: 0px 20px 10px 0px;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.checkbox {
+    font-size: 10px;
+    color: darkgrey;
+    font-family: 'Inconsolata', monospace;
+    font-weight: 300;
+}
+
+#log-container {
+    height: 500px;
+    top: -250px;
+    margin-top: 50%;
+    position: relative;
+
+    overflow: hidden;
+    font-family: 'Roboto', Helvetica, sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    font-style: normal;
+    font-variant: normal;
+}
+
+.log-box {
+    height: 371px;
+}
+
+.log-box_scroller_wrapper {
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.log-box_scroller {
+    position: absolute;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    width: 100%;
+    padding: 0;
+}
+
+.log-box_clean {
+    float: right;
+}
+
+.log-output {
+    margin-left: 1em;
+    font-size: 15px;
+    color: black;
+    font-family: 'Inconsolata', monospace;
+}
+
+.log-output-prefix-success {
+    font-size: 13px;
+    color: #2196F3;
+    font-family: 'Inconsolata', monospace;
+    font-weight: bold;
+}
+
+.log-output-prefix-warn {
+    font-size: 13px;
+    color: #3949AB;
+    font-family: 'Inconsolata', monospace;
+    font-weight: bold;
+}
+
+.log-output-prefix-error {
+    font-size: 13px;
+    color: #F44336;
+    font-family: 'Inconsolata', monospace;
+    font-weight: bold;
+}

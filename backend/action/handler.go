@@ -70,11 +70,6 @@ func ClusterStatusHandle(c context.Context, w http.ResponseWriter, r *http.Reque
 	switch r.Method {
 	case http.MethodGet:
 		response := StatusClientResponse{Success: true}
-		defer func() {
-			if !response.Success {
-				log.Error(response.Result)
-			}
-		}()
 
 		// translate parameters
 		queries := r.URL.Query()
@@ -220,11 +215,6 @@ func ClientGetHandle(c context.Context, w http.ResponseWriter, r *http.Request) 
 	switch r.Method {
 	case http.MethodGet:
 		response := GetClientResponse{Success: true}
-		defer func() {
-			if !response.Success {
-				log.Error(response.Result)
-			}
-		}()
 
 		// translate parameters
 		queries := r.URL.Query()
@@ -469,11 +459,6 @@ func ClientV2LsHandle(c context.Context, w http.ResponseWriter, r *http.Request)
 	switch r.Method {
 	case http.MethodGet:
 		response := LsClientResponse{Success: true}
-		defer func() {
-			if !response.Success {
-				log.Error(response.Result)
-			}
-		}()
 
 		// translate parameters
 		queries := r.URL.Query()
@@ -586,11 +571,6 @@ func ClientV3LeaseHandle(c context.Context, w http.ResponseWriter, r *http.Reque
 	switch r.Method {
 	case http.MethodGet:
 		response := LeaseClientResponse{Success: true}
-		defer func() {
-			if !response.Success {
-				log.Error(response.Result)
-			}
-		}()
 
 		// translate parameters
 		queries := r.URL.Query()
@@ -665,11 +645,6 @@ func ClientV3LeaseHandle(c context.Context, w http.ResponseWriter, r *http.Reque
 		//}
 	case http.MethodDelete:
 		response := LeaseClientResponse{Success: true}
-		defer func() {
-			if !response.Success {
-				log.Error(response.Result)
-			}
-		}()
 
 		// translate parameters
 		queries := r.URL.Query()
@@ -710,11 +685,6 @@ func ClientV3LeaseHandle(c context.Context, w http.ResponseWriter, r *http.Reque
 
 	case http.MethodPost:
 		response := LeaseClientResponse{Success: true}
-		defer func() {
-			if !response.Success {
-				log.Error(response.Result)
-			}
-		}()
 
 		// translate parameters
 		request := LeaseClientRequest{}
@@ -761,11 +731,6 @@ func ClientV3LeaseHandle(c context.Context, w http.ResponseWriter, r *http.Reque
 
 	case http.MethodPut:
 		response := LeaseClientResponse{Success: true}
-		defer func() {
-			if !response.Success {
-				log.Error(response.Result)
-			}
-		}()
 
 		// translate parameters
 		request := LeaseClientRequest{}
@@ -841,7 +806,7 @@ type SetClientRequest struct {
 
 	// v3
 	Lease       string
-	PrevKv      bool
+	PrevKV      bool
 	IgnoreValue bool
 	IgnoreLease bool
 }
@@ -860,11 +825,6 @@ func ClientSetHandle(c context.Context, w http.ResponseWriter, r *http.Request) 
 	switch r.Method {
 	case http.MethodPost:
 		response := SetClientResponse{Success: true}
-		defer func() {
-			if !response.Success {
-				log.Error(response.Result)
-			}
-		}()
 
 		// translate parameters
 		request := SetClientRequest{}
@@ -882,7 +842,7 @@ func ClientSetHandle(c context.Context, w http.ResponseWriter, r *http.Request) 
 		defer timeoutCancelFn()
 
 		key := request.Key
-		if key != "" {
+		if len(key) != 0 && key != "" {
 			key = template.HTMLEscapeString(key)
 		} else {
 			response.Success = false
@@ -891,7 +851,7 @@ func ClientSetHandle(c context.Context, w http.ResponseWriter, r *http.Request) 
 		}
 
 		value := request.Value
-		if value != "" {
+		if len(value) != 0 && value != "" {
 			value = template.HTMLEscapeString(value)
 		} else {
 			response.Success = false
@@ -900,8 +860,6 @@ func ClientSetHandle(c context.Context, w http.ResponseWriter, r *http.Request) 
 		}
 
 		if isV2 {
-			// translate parameters
-
 			// create opts
 			v2Opts := v2.SetOptions{TTL: time.Duration(request.TTL) * time.Second, PrevIndex: uint64(request.SwapWithIndex), PrevValue: request.SwapWithValue}
 
@@ -942,7 +900,7 @@ func ClientSetHandle(c context.Context, w http.ResponseWriter, r *http.Request) 
 				v3Opts = append(v3Opts, v3.WithLease(v3.LeaseID(leaseId)))
 			}
 
-			if request.PrevKv {
+			if request.PrevKV {
 				v3Opts = append(v3Opts, v3.WithPrevKV())
 			}
 
@@ -969,7 +927,7 @@ func ClientSetHandle(c context.Context, w http.ResponseWriter, r *http.Request) 
 			}
 
 			// deal return
-			response.Results = displaySimple.V3SprintSetResponse(c, request.PrevKv, !request.IgnoreValue, etcdResponse)
+			response.Results = displaySimple.V3SprintSetResponse(c, request.PrevKV, !request.IgnoreValue, etcdResponse)
 
 		}
 
@@ -999,11 +957,6 @@ func ClientRemoveHandle(c context.Context, w http.ResponseWriter, r *http.Reques
 	switch r.Method {
 	case http.MethodDelete:
 		response := RemoveClientResponse{Success: true}
-		defer func() {
-			if !response.Success {
-				log.Error(response.Result)
-			}
-		}()
 
 		// translate parameters
 		queries := r.URL.Query()

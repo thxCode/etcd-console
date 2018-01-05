@@ -1,0 +1,8 @@
+.mat-toolbar a {
+    color: white;
+}
+
+.mat-toolbar-active button {
+	text-decoration: underline;
+}
+

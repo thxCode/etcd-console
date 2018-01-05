@@ -1,0 +1,47 @@
+{
+    "project": {
+        "version": "1.0.0",
+        "name": "etcd-console"
+    },
+    "apps": [{
+        "root": "./frontend",
+        "outDir": "./.build/frontend/",
+        "assets": [],
+        "index": "index.html",
+        "main": "main.ts",
+        "test": "test.ts",
+        "tsconfig": "tsconfig.app.json",
+        "prefix": "app",
+        "mobile": false,
+        "styles": [
+            "styles.css",
+            "etcd-console-theme.scss"
+        ],
+        "scripts": [],
+        "environmentSource": "environments/environment.ts",
+        "environments": {
+            "prod": "environments/environment.prod.ts",
+            "dev": "environments/environment.ts"
+        }
+    }],
+    "addons": [],
+    "packages": [],
+    "e2e": {
+        "protractor": {
+            "config": "./protractor.conf.js"
+        }
+    },
+    "test": {
+        "karma": {
+            "config": "./karma.conf.js"
+        }
+    },
+    "defaults": {
+        "styleExt": "css",
+        "prefixInterfaces": false,
+        "lazyRoutePrefix": "+",
+        "serve": {
+            "proxyConfig": "./proxy.conf.json"
+        }
+    }
+}

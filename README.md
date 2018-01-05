@@ -26,7 +26,7 @@ Usage of etcd-console:
   -listen-url string
     	Specify listening URL. (default "0.0.0.0:8080")
   -test
-    	Specify using embedding etcd. (default false)
+    	Specify using embedding etcd. (default true)
 
 ```
 
@@ -37,18 +37,14 @@ Using `ETCD_ENDPOINTS` environment variable can also set the endpoints of etcd.
 To start a container, use the following:
 
 ``` bash
-$ docker run -it --name test-ec maiwj/etcd-console bash
-
-# etcd-console --test
+$ docker run -d --name test-ec maiwj/etcd-console
 
 ```
 
 ### Get list from Kubernetes Pod
 
 ``` bash
-$ kubectl run -it --image maiwj/etcd-console:latest test bash
-
-# etcd-console --test
+$ kubectl run --image maiwj/etcd-console:latest test
 
 ```
 
