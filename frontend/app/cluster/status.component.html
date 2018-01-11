@@ -4,15 +4,15 @@
             <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="border: 0px solid black" preserveAspectRatio="xMinYMin meet" viewBox="0,0,10000,10000">
                 <circle cx="5000" cy="5000" r="3500" style="fill: #F5F5F5"></circle>
                 <g id="servers">
-                    <g *ngFor="let memberStatus of memberStatuses; let i=index;" class="circle_basic"
-                        [class.circle_stopped]="memberStatus.State == 'Stopped'"
-                        [class.circle_follower]="memberStatus.State == 'Follower'"
-                        [class.circle_leader]="memberStatus.State == 'Leader'"
+                    <g *ngFor="let memberStatus of memberStatuses; let i=index;" class="circle_losted"
+                        [class.circle_stopped]="memberStatus.state == 'Stopped'"
+                        [class.circle_follower]="memberStatus.state == 'Follower'"
+                        [class.circle_leader]="memberStatus.state == 'Leader'"
                         [attr.tabindex]="i">
                         <a (click)="selectTab(i)">
                             <circle [attr.cx]="memberStatus.circleCoord.x" [attr.cy]="memberStatus.circleCoord.y" [attr.r]="memberStatus.circleCoord.r"></circle>
                         </a>
-                        <text [attr.x]="memberStatus.txtCoord.x" [attr.y]="memberStatus.txtCoord.y" [attr.font-size]="memberStatus.txtCoord.r">{{ memberStatus.Name }}</text>
+                        <text [attr.x]="memberStatus.txtCoord.x" [attr.y]="memberStatus.txtCoord.y" [attr.font-size]="memberStatus.txtCoord.r">{{ memberStatus.name }}</text>
                     </g>
                 </g>
             </svg>
@@ -21,19 +21,19 @@
             <mat-card class="card">
                 <mat-tab-group [(selectedIndex)]="selectedTab">
                     <mat-tab *ngFor="let memberStatus of memberStatuses;">
-                        <ng-template matTabLabel>{{memberStatus.Name}}</ng-template>
+                        <ng-template matTabLabel>{{memberStatus.name}}</ng-template>
                         <br/>
                         <ul class="card-info">
-                            <li><span class="card-info_title">{{localService.core.MEMBER_CARD_TITLE_ID}}</span> <span class="card-info_value">{{memberStatus.ID}}</span></li>
-                            <li><span class="card-info_title">{{localService.core.MEMBER_CARD_TITLE_ENDPOINT}}</span> <span class="card-info_value">{{memberStatus.Endpoint}}</span></li>
-                            <li><span class="card-info_title">{{localService.core.MEMBER_CARD_TITLE_STATE}}</span>
-                                <span *ngIf="memberStatus.State == 'Stopped'" class="card-info_value member_stopped">{{memberStatus.State}}</span>
-                                <span *ngIf="memberStatus.State == 'Follower'" class="card-info_value member_follower">{{memberStatus.State}}</span>
-                                <span *ngIf="memberStatus.State == 'Leader'" class="card-info_value member_leader">{{memberStatus.State}}</span>
+                            <li><span class="card-info_title">{{localService.MEMBER_CARD_TITLE_ID}}</span> <span class="card-info_value">{{memberStatus.id}}</span></li>
+                            <li><span class="card-info_title">{{localService.MEMBER_CARD_TITLE_ENDPOINT}}</span> <span class="card-info_value">{{memberStatus.endpoint}}</span></li>
+                            <li><span class="card-info_title">{{localService.MEMBER_CARD_TITLE_STATE}}</span>
+                                <span *ngIf="memberStatus.state == 'Stopped'" class="card-info_value member_stopped">{{memberStatus.state}}</span>
+                                <span *ngIf="memberStatus.state == 'Follower'" class="card-info_value member_follower">{{memberStatus.state}}</span>
+                                <span *ngIf="memberStatus.state == 'Leader'" class="card-info_value member_leader">{{memberStatus.state}}</span>
+                                <span *ngIf="memberStatus.state == 'Losted'" class="card-info_value member_losted">{{memberStatus.state}}</span>
                             </li>
-                            <li *ngIf='memberStatus.DBSize'><span class="card-info_title">{{localService.core.MEMBER_CARD_TITLE_DBSIZE}}</span> <span class="card-info_value">{{memberStatus.DBSize}}</span></li>
-                            <li *ngIf='memberStatus.Version'><span class="card-info_title">{{localService.core.MEMBER_CARD_TITLE_VERSION}}</span> <span class="card-info_value">{{memberStatus.Version}}</span></li>
-                            <li *ngIf='memberStatus.Hash'><span class="card-info_title">{{localService.core.MEMBER_CARD_TITLE_HASH}}</span> <span class="card-info_value">{{memberStatus.Hash}}</span></li>
+                            <li *ngIf='memberStatus.dbSize'><span class="card-info_title">{{localService.MEMBER_CARD_TITLE_DBSIZE}}</span> <span class="card-info_value">{{memberStatus.dbSize}}</span></li>
+                            <li *ngIf='memberStatus.version'><span class="card-info_title">{{localService.MEMBER_CARD_TITLE_VERSION}}</span> <span class="card-info_value">{{memberStatus.version}}</span></li>
                         </ul>
                         <p class="card-error">
                             <span *ngIf='clusterStatusErrorMsg'>error: {{clusterStatusErrorMsg}}</span>

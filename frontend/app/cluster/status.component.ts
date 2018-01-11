@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterContentInit, OnDestroy } from '@angular/core';
 import { SessionStorageService } from 'ngx-webstorage';
-import { BackendService, StatusCluster, MemberStatus } from './backend.service';
+import { BackendService, MemberStatusResponse } from './backend.service';
 import { LocalService } from '../language/local.service';
 
 @Component({
@@ -14,7 +14,7 @@ export class StatusComponent implements OnInit, AfterContentInit, OnDestroy {
   responseError: any;
 
   selectedTab: number;
-  memberStatuses: MemberStatus[];
+  memberStatuses: MemberStatusResponse[];
   clusterStatusFetchHandler;
 
   constructor(
@@ -26,7 +26,7 @@ export class StatusComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.memberStatuses = this.sessionStorage.retrieve('clusterMemberStatuses');
+    this.memberStatuses = this.sessionStorage.retrieve('memberStatuses');
   }
 
   ngAfterContentInit() {
@@ -35,12 +35,11 @@ export class StatusComponent implements OnInit, AfterContentInit, OnDestroy {
 
   ngOnDestroy() {
     clearInterval(this.clusterStatusFetchHandler);
-    this.sessionStorage.store('clusterMemberStatuses', this.memberStatuses);
-    return;
+    this.sessionStorage.store('memberStatuses', this.memberStatuses);
   }
 
   connectCluster() {
-    this.clusterStatusFetchHandler = setInterval(() => this.getClusterStatus(), 1000);
+    this.clusterStatusFetchHandler = setInterval(() => this.getMemberStatuses(), 2000);
   }
 
   selectTab(num: number) {
@@ -48,20 +47,12 @@ export class StatusComponent implements OnInit, AfterContentInit, OnDestroy {
   }
 
   ///////////////////////////////////////////////////////
-  private processClusterStatusResponse(resp: StatusCluster) {
+  getMemberStatuses() {
     this.responseError = null;
-    this.memberStatuses = resp.Members;
-  }
 
-  // getServerStatus fetches server status from backend.
-  // memberStatus is true to get the status of all nodes.
-  getClusterStatus() {
-    let clusterStatusResult: StatusCluster;
-
-    this.backendService.fetchClusterStatus().subscribe(
-      clusterStatus => clusterStatusResult = clusterStatus,
+    this.backendService.fetchMemberStatuses().subscribe(
+      memberStatusesResp => this.memberStatuses = memberStatusesResp,
       error => this.responseError = <any>error,
-      () => this.processClusterStatusResponse(clusterStatusResult),
     );
   }
   ///////////////////////////////////////////////////////

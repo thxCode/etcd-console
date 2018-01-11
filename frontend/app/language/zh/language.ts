@@ -12,6 +12,13 @@ export const Language = Object.freeze({
  	MEMBER_CARD_TITLE_VERSION: '版本:',
  	MEMBER_CARD_TITLE_HASH: '哈希值:',
 
+ 	BACKUP_COLUMN_NAME: '名称',
+ 	BACKUP_COLUMN_SIZE: '大小',
+ 	BACKUP_COLUMN_CREATE_TIME: '创建时间',
+ 	BACKUP_COLUMN_OPS: '操作',
+ 	BACKUP_OP_SUBMIT: '创建备份',
+ 	BACKUP_OP_DELETE: '删除',
+
  	CLIENT_OP_WRITE: '写入',
  	CLIENT_OP_READ: '读取',
  	CLIENT_OP_REMOVE: '删除',

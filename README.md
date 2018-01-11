@@ -1,6 +1,6 @@
 # etcd Console
 
-A console supports etcd v2 and v3 by Alpine.
+A console supports etcd v3 by Alpine.
 
 [![](https://img.shields.io/badge/Github-thxcode/etcd--console-orange.svg)](https://github.com/thxcode/etcd-console)&nbsp;[![](https://img.shields.io/badge/Docker_Hub-maiwj/etcd--console-orange.svg)](https://hub.docker.com/r/maiwj/etcd-console)&nbsp;[![](https://img.shields.io/docker/build/maiwj/etcd-console.svg)](https://hub.docker.com/r/maiwj/etcd-console)&nbsp;[![](https://img.shields.io/docker/pulls/maiwj/etcd-console.svg)](https://store.docker.com/community/images/maiwj/etcd-console)&nbsp;[![](https://img.shields.io/github/license/thxcode/etcd-console.svg)](https://github.com/thxcode/etcd-console)
 
@@ -19,32 +19,34 @@ A console supports etcd v2 and v3 by Alpine.
 ```bash
 $ etcd-console -h
 Usage of etcd-console:
-  -api-version int
-    	Specify the api version of etcd. (default 3)
+  -advertise string
+        The address is used for communicating etcd-console data. (default "0.0.0.0:8080")
+  -backup-dir string
+        Where is storing the backup zip files. (default "/${os.TempDir()}/etcd_console.backup")
+  -config string
+        Specify the configuration yaml of etcd-console.
   -endpoints string
-    	Specify using endpoints of endpoints, if on testing, it will be setting by http://localhost:2379.
-  -listen-url string
-    	Specify listening URL. (default "0.0.0.0:8080")
+        Specify using endpoints of etcd, splitting by comma. (default "http://127.0.0.1:2379")
+  -log-level string
+        Log level of etcd-console. (default "debug")
   -test
-    	Specify using embedding etcd. (default true)
+        Start with an embedding etcd or not. (default true)
 
 ```
-
-Using `ETCD_ENDPOINTS` environment variable can also set the endpoints of etcd.
 
 ### Start an instance
 
 To start a container, use the following:
 
 ``` bash
-$ docker run -d --name test-ec maiwj/etcd-console
+$ docker run -d --name test-ec -p 8080:80 maiwj/etcd-console
 
 ```
 
 ### Get list from Kubernetes Pod
 
 ``` bash
-$ kubectl run --image maiwj/etcd-console:latest test
+$ kubectl run --image maiwj/etcd-console:latest --port=80 test
 
 ```
 

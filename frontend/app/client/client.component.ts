@@ -56,9 +56,6 @@ export class LogLine {
   providers: [BackendService, LocalService],
 })
 export class ClientComponent implements AfterViewChecked, AfterContentInit {
-
-  responseError: any;
-
   logBoxIScroll: IScroll;
   logBoxIScrollRefresh: boolean;
 
@@ -123,27 +120,23 @@ export class ClientComponent implements AfterViewChecked, AfterContentInit {
   }
 
   ///////////////////////////////////////////////////////
-  private processClientResponse(resp: ProccessResponse) {
-    this.responseError = null;
-    
-    for (let idx in resp.Results) {
-      this.sendLogLine(resp.Level, resp.Results[idx]);
-    }
-    this.logBoxIScrollRefresh = true;
-  }
-
   processClientRequest(act: string) {
     let clientRequest = new ProccessRequest(act);
+    clientRequest.append('key', this.inputKey);
+    clientRequest.append('value', this.inputValue);
+    clientRequest.append('prefix', this.inputPrefix);
 
-    clientRequest.append('Key', this.inputKey);
-    clientRequest.append('Value', this.inputValue);
-    clientRequest.append('Prefix', this.inputPrefix);
-
-    let clientResponseFromSubscribe: ProccessResponse;
     this.backendService.process(clientRequest).subscribe(
-      clientResponse => clientResponseFromSubscribe = clientResponse,
-      error => this.responseError = <any>error,
-      () => this.processClientResponse(clientResponseFromSubscribe), // on-complete
+      clientResponse => {
+        for (let idx in clientResponse.results) {
+          this.sendLogLine(clientResponse.level, clientResponse.results[idx]);
+        }
+        this.logBoxIScrollRefresh = true;
+      },
+      error => {
+        this.sendLogLine(2, error)
+        this.logBoxIScrollRefresh = true;
+      },
     );
   }
   ///////////////////////////////////////////////////////

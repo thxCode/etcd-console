@@ -39,7 +39,6 @@ RUN cd $GOPATH/src/github.com/thxcode/etcd-console; \
 RUN cd $GOPATH/src/github.com/thxcode/etcd-console; \
     npm install -g @angular/cli --unsafe; \
     yarn install --prod; \
-    npm rebuild node-sass --force --unsafe; \
     ng build --prod; \
     cp -rf ./.build/frontend /build/frontend/etcd-console
 
@@ -62,7 +61,7 @@ ARG VERSION
 LABEL \
     io.github.thxcode.build-date=$BUILD_DATE \
     io.github.thxcode.name="etcd-console" \
-    io.github.thxcode.description="A console supports etcd v2 and v3 by Alpine in a docker container." \
+    io.github.thxcode.description="A console supports etcd v3 by Alpine in a docker container." \
     io.github.thxcode.url="https://github.com/thxcode/etcd-console" \
     io.github.thxcode.vcs-type="Git" \
     io.github.thxcode.vcs-ref=$VCS_REF \
@@ -73,8 +72,7 @@ LABEL \
     io.github.thxcode.license="MIT" \
     io.github.thxcode.docker.dockerfile="/Dockerfile"
 
-ENV ETCD_ENDPOINTS="http://localhost:2379" \
-    GRPC_GO_LOG_SEVERITY_LEVEL="WARNING" \
+ENV GRPC_GO_LOG_SEVERITY_LEVEL="WARNING" \
     GRPC_GO_LOG_VERBOSITY_LEVEL="WARNING"
 
 RUN apk add --update --no-cache \

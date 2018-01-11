@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, Response, URLSearchParams, Headers, RequestOptions, RequestOptionsArgs, ResponseContentType} from '@angular/http';
+import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import 'rxjs/Rx';
 import * as _ from 'lodash';
@@ -21,58 +21,47 @@ export class ProccessRequest {
       _.set(this, key, val);
       return this;
     }
-
   }
 
 }
 
 class ClientRequest {
 
-  bodyParams(): RequestOptionsArgs {
-    let clone = _.cloneDeep(this);
-
-    return new RequestOptions({
-      responseType: ResponseContentType.Json,
-      headers: new Headers({ 'Content-Type': 'application/json' }),
-      body: JSON.stringify(clone)
-    });
+  json() {
+    return JSON.stringify(_.cloneDeep(this));
   }
 
-  searchParams(): RequestOptionsArgs {
+  params() {
     let clone = _.cloneDeep(this);
 
-    let params = new URLSearchParams();
+    let params = {};
     _.forEach(_.keys(clone), (key) => {
       if (clone[key]) {
-        params.append(key, _.toString(clone[key]));
+        params[key] = _.toString(clone[key]);
       }
     })
 
-    return new RequestOptions({
-      responseType: ResponseContentType.Json,
-      search: params
-    });
+    return params;
   }
-
 }
 
-export class GetClientRequest extends ClientRequest {
-  Key: string;
+export class ReadClientRequest extends ClientRequest {
+  key: string;
 
   //v2
-  Sort: boolean;
-  Quorum: boolean;
+  sort: boolean;
+  quorum: boolean;
   
   //v3
-  Prefix: boolean;
-  FromKey: boolean;
-  Consistency: string;
-  SortOrder: string;
-  SortBy: string;
-  Limit: number;
-  Rev: number;
-  KeysOnly: boolean;
-  Range: string;
+  prefix: boolean;
+  fromKey: boolean;
+  consistency: string;
+  sortOrder: string;
+  sortTarget: string;
+  limit: number;
+  rev: number;
+  keysOnly: boolean;
+  range: string;
 
   constructor(
     key: string,
@@ -86,7 +75,7 @@ export class GetClientRequest extends ClientRequest {
     fromKey: boolean,
     consistency: string,
     sortOrder: string,
-    sortBy: string,
+    sortTarget: string,
     limit: number,
     rev: number,
     keysOnly: boolean,
@@ -94,54 +83,55 @@ export class GetClientRequest extends ClientRequest {
   ){
     super();
 
-    this.Key = key;
+    this.key = key;
 
-    this.Sort = sort;
-    this.Quorum = quorum;
+    this.sort = sort;
+    this.quorum = quorum;
 
-    this.Prefix = prefix;
-    this.FromKey = fromKey;
-    this.Consistency = consistency;
-    this.SortOrder = sortOrder;
-    this.SortBy = sortBy;
-    this.Limit = limit;
-    this.Rev = rev;
-    this.KeysOnly = keysOnly;
-    this.Range = range;
+    this.prefix = prefix;
+    this.fromKey = fromKey;
+    this.consistency = consistency;
+    this.sortOrder = sortOrder;
+    this.sortTarget = sortTarget;
+    this.limit = limit;
+    this.rev = rev;
+    this.keysOnly = keysOnly;
+    this.range = range;
   }
 
   static newInstance(obj: Object) {
-     return new GetClientRequest(
-       obj['Key'], 
-       obj['Sort'], 
-       obj['Quorum'], 
-       obj['Prefix'], 
-       obj['FromKey'], 
-       obj['Consistency'], 
-       obj['SortOrder'],
-       obj['SortBy'],
-       obj['Limit'],
-       obj['Rev'],
-       obj['KeysOnly'],
-       obj['Range']
+     return new ReadClientRequest(
+       obj['key'], 
+       obj['sort'], 
+       obj['quorum'], 
+       obj['prefix'], 
+       obj['fromKey'], 
+       obj['consistency'], 
+       obj['sortOrder'],
+       obj['sortTarget'],
+       obj['limit'],
+       obj['rev'],
+       obj['keysOnly'],
+       obj['range']
      );
   }
 
 }
 
-export class SetClientRequest extends ClientRequest {
-  Key: string;
-  Value: string;
+export class WriteClientRequest extends ClientRequest {
+  key: string;
+  value: string;
 
   //v2
-  SwapWithIndex: number;
-  SwapWithValue: string;
+  ttl: number;
+  swapWithIndex: number;
+  swapWithValue: string;
 
   //v3
-  LeaseId: string;
-  PrevKV: boolean;
-  IgnoreValue: boolean;
-  IgnoreLease: boolean;
+  lease: string;
+  prevKV: boolean;
+  ignoreValue: boolean;
+  ignoreLease: boolean;
 
   constructor(
 
@@ -149,58 +139,61 @@ export class SetClientRequest extends ClientRequest {
     value: string,
 
     //v2
+    ttl: number,
     swapWithIndex: number,
     swapWithValue: string,
 
     //v3
-    leaseId: string,
+    lease: string,
     prevKV: boolean,
     ignoreValue: boolean,
     ignoreLease: boolean,
   ){
     super();
 
-    this.Key = key;
-    this.Value = value;
+    this.key = key;
+    this.value = value;
 
-    this.SwapWithIndex = swapWithIndex;
-    this.SwapWithValue = swapWithValue;
+    this.ttl = ttl;
+    this.swapWithIndex = swapWithIndex;
+    this.swapWithValue = swapWithValue;
 
-    this.LeaseId =leaseId;
-    this.PrevKV = prevKV;
-    this.IgnoreValue = ignoreValue;
-    this.IgnoreLease = ignoreLease;
+    this.lease = lease;
+    this.prevKV = prevKV;
+    this.ignoreValue = ignoreValue;
+    this.ignoreLease = ignoreLease;
   }
 
   static newInstance(obj: Object) {
-     return new SetClientRequest(
-       obj['Key'], 
-       obj['Value'], 
-       obj['SwapWithIndex'], 
-       obj['SwapWithValue'], 
-       obj['LeaseId'], 
-       obj['PrevKV'], 
-       obj['IgnoreValue'],
-       obj['IgnoreLease']
+     return new WriteClientRequest(
+       obj['key'], 
+       obj['value'], 
+       obj['ttl'], 
+       obj['swapWithIndex'], 
+       obj['swapWithValue'], 
+       obj['lease'], 
+       obj['prevKV'], 
+       obj['ignoreValue'],
+       obj['ignoreLease']
      );
   }
 
 }
 
 export class RemoveClientRequest extends ClientRequest {
-  Key: string;
+  key: string;
 
   //v2
-  Dir: boolean;
-  Recursive: boolean;
-  WithValue: string;
-  WithIndex: number;
+  dir: boolean;
+  recursive: boolean;
+  withValue: string;
+  withIndex: number;
 
   //v3
-  Prefix: boolean;
-  FromKey: boolean;
-  PrevKV: boolean;
-  Range: string;
+  prefix: boolean;
+  fromKey: boolean;
+  prevKV: boolean;
+  range: string;
 
   constructor(
     key: string,
@@ -219,162 +212,167 @@ export class RemoveClientRequest extends ClientRequest {
   ){
     super();
 
-    this.Key = key;
+    this.key = key;
 
-    this.Dir = dir;
-    this.Recursive = recursive;
-    this.WithValue = withValue;
-    this.WithIndex = withIndex;
+    this.dir = dir;
+    this.recursive = recursive;
+    this.withValue = withValue;
+    this.withIndex = withIndex;
 
-    this.Prefix =prefix;
-    this.FromKey = fromKey;
-    this.PrevKV = prevKV;
-    this.Range = range;
+    this.prefix = prefix;
+    this.fromKey = fromKey;
+    this.prevKV = prevKV;
+    this.range = range;
   }
 
   static newInstance(obj: Object) {
      return new RemoveClientRequest(
-       obj['Key'], 
-       obj['Dir'], 
-       obj['Recursive'], 
-       obj['WithValue'], 
-       obj['WithIndex'], 
-       obj['Prefix'], 
-       obj['FromKey'],
-       obj['PrevKV'],
-       obj['Range']
+       obj['key'], 
+       obj['dir'], 
+       obj['recursive'], 
+       obj['withValue'], 
+       obj['withIndex'], 
+       obj['prefix'], 
+       obj['fromKey'],
+       obj['prevKV'],
+       obj['range']
      );
   }
 
 }
 
 export class ProccessResponse {
-  Level: number; // 0 - success, 1 - warn, 2 - error
-  Results: string[];
+  level: number; // 0 - success, 1 - warn, 2 - error
+  results: string[];
 
   constructor(
     l: number,
     rss: string[]
   ) {
-    this.Level = l;
-    this.Results = rss;
+    this.level = l;
+    this.results = rss;
   }
 }
 
 @Injectable()
 export class BackendService {
   private endpoints = {
-    read: 'client/get',
-    write: 'client/set',
-    remove: 'client/remove'
+    read: '/api/v1/client/read',
+    write: '/api/v1/client/write',
+    remove: '/api/v1/client/remove'
   }
 
-  private jsonRequestOptions = new RequestOptions({
-    responseType: ResponseContentType.Json,
-    headers: new Headers({ 'Content-Type': 'application/json' })
-  });
-
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
   }
 
   process(request: ProccessRequest): Observable<ProccessResponse> {
     switch (request.Action) {
       case 'write':
-        return this.set(SetClientRequest.newInstance(request));
+        return this.write(WriteClientRequest.newInstance(request));
       case 'remove':
         return this.remove(RemoveClientRequest.newInstance(request));
       default:
-        return this.get(GetClientRequest.newInstance(request));
+        return this.read(ReadClientRequest.newInstance(request));
     }
   }
 
-  private processHTTPErrorClient(error: any) {
-    let errMsg = (error.message) ? error.message :
-      error.status ? `${error.status} - ${error.statusText}` : 'Server error';
-    console.error(errMsg);
-    return Observable.throw(errMsg);
+  private processHTTPErrorClient(err: HttpErrorResponse) {
+    if (err.error) {
+      return Observable.throw(err.error);
+    } else {
+      let errMsg = (err.message) ? err.message :
+        err.status ? `${err.status} - ${err.statusText}` : 'Server error';
+      return Observable.throw(errMsg);
+    }
   }
 
   ///////////////////////////////////////////////////////
-  private processHTTPResponseClientGet(res: Response) {
-    let responseJson = res.json();
-    if (responseJson.Success) {
-      if (responseJson.KeyValues && responseJson.KeyValues.length > 0) {
-        let rss = [responseJson.Result, '.'];
+  private processHTTPResponseClientRead(responseJson: any) {
+    if (!_.isEmpty(responseJson.kvs)) {
+      let rss = [responseJson.result, '.'];
 
-        _.forEach(responseJson.KeyValues, (kv) => {
-          if (kv.Value) {
-            rss.push(`|-- ${kv.Key} = ${kv.Value}`);
-          } else {
-            rss.push(`|-- ${kv.Key}`);
-          }
-        });
+      _.forEach(responseJson.kvs, (kv) => {
+        if (kv.value) {
+          rss.push(`|-- ${kv.key} = ${kv.value}`);
+          rss.push(`\\---- [crev: ${kv.createRevision}, rev: ${kv.modRevision}, ver: ${kv.version}, lease: ${kv.lease}]`)
+        } else {
+          rss.push(`|-- ${kv.key}`);
+          rss.push(`\\----[crev: ${kv.createRevision}, rev: ${kv.modRevision}, ver: ${kv.version}, lease: ${kv.lease}]`)
+        }
+      });
 
-        return new ProccessResponse(0, rss);
-      } else {
-        return new ProccessResponse(1, ['cannot read anything']);
-      }
+      return new ProccessResponse(0, rss);
     } else {
-       return new ProccessResponse(2, [responseJson.Result ? responseJson.Result : 'unknown error']);
+      return new ProccessResponse(1, ['cannot read anything']);
     }
   }
 
-  private get(request: GetClientRequest): Observable<ProccessResponse> {
-    return this.http.get(this.endpoints.read, request.searchParams())
-      .map(this.processHTTPResponseClientGet)
+  private read(request: ReadClientRequest): Observable<ProccessResponse> {
+    return this.http.get(this.endpoints.read, {
+      responseType: 'json',
+      params: request.params()
+    })
+      .map(this.processHTTPResponseClientRead)
       .catch(this.processHTTPErrorClient);
   }
   ///////////////////////////////////////////////////////
 
   ///////////////////////////////////////////////////////
-  private processHTTPResponseClientSet(res: Response) {
-    let responseJson = res.json();
-    if (responseJson.Success) {
-      let rss = [responseJson.Result];
+  private processHTTPResponseClientWrite(responseJson: any) {
+    let rss = [responseJson.result];
 
-      if (responseJson.Results && responseJson.Results.length > 1) {
-        _.forEach(responseJson.Results, (rs, idx) => {
-          if (rs) {
-            rss.push(`${idx}: ${rs}`);
-          }
-        });
-      }
-      
-      return new ProccessResponse(0, rss);
-    } else {
-      return new ProccessResponse(2, [responseJson.Result ? responseJson.Result : 'unknown error']);
+    if (!_.isEmpty(responseJson.kvs)) {
+      rss.push('.');
+
+      _.forEach(responseJson.kvs, (kv) => {
+        if (kv.value) {
+          rss.push(`|-- ${kv.key} = ${kv.value}`);
+          rss.push(`\\---- [crev: ${kv.createRevision}, rev: ${kv.modRevision}, ver: ${kv.version}, lease: ${kv.lease}]`)
+        } else {
+          rss.push(`|-- ${kv.key}`);
+          rss.push(`\\---- [crev: ${kv.createRevision}, rev: ${kv.modRevision}, ver: ${kv.version}, lease: ${kv.lease}]`)
+        }
+      });
     }
+
+    return new ProccessResponse(0, rss);
   }
 
-  private set(request: SetClientRequest): Observable<ProccessResponse> {
-    return this.http.post(this.endpoints.write, null, request.bodyParams())
-      .map(this.processHTTPResponseClientSet)
+  private write(request: WriteClientRequest): Observable<ProccessResponse> {
+    return this.http.post(this.endpoints.write, request.json(), {
+      responseType: 'json'
+    })
+      .map(this.processHTTPResponseClientWrite)
       .catch(this.processHTTPErrorClient);
   }
   ///////////////////////////////////////////////////////
 
   ///////////////////////////////////////////////////////
-  private processHTTPResponseClientRemove(res: Response) {
-    let responseJson = res.json();
-    if (responseJson.Success) {
-      let rss = [responseJson.Result];
+  private processHTTPResponseClientRemove(responseJson: any) {
+    let rss = [responseJson.result];
 
-      if (responseJson.Results && responseJson.Results.length > 1) {
-        _.forEach(responseJson.Results, (rs, idx) => {
-          if (rs) {
-            rss.push(`${idx}: ${rs}`);
-          }
-        });
-      }
-      
-      return new ProccessResponse(0, rss);
-    } else {
-      return new ProccessResponse(2, [responseJson.Result ? responseJson.Result : 'unknown error']);
+    if (!_.isEmpty(responseJson.kvs)) {
+      rss.push('.');
+
+      _.forEach(responseJson.kvs, (kv) => {
+        if (kv.value) {
+          rss.push(`|-- ${kv.key} = ${kv.value}`);
+          rss.push(`\\---- [crev: ${kv.createRevision}, rev: ${kv.modRevision}, ver: ${kv.version}, lease: ${kv.lease}]`)
+        } else {
+          rss.push(`|-- ${kv.key}`);
+          rss.push(`  \\- [crev: ${kv.createRevision}, rev: ${kv.modRevision}, ver: ${kv.version}, lease: ${kv.lease}]`)
+        }
+      });
     }
+    
+    return new ProccessResponse(0, rss);
   }
 
   private remove(request: RemoveClientRequest): Observable<ProccessResponse> {
-    return this.http.delete(this.endpoints.remove, request.searchParams())
+    return this.http.delete(this.endpoints.remove, {
+      responseType: 'json',
+      params: request.params()
+    })
       .map(this.processHTTPResponseClientRemove)
       .catch(this.processHTTPErrorClient);
   }

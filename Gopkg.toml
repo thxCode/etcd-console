@@ -24,3 +24,20 @@
 [[constraint]]
   name = "github.com/coreos/etcd"
   version = "3.2.12"
+
+[[constraint]]
+  name = "github.com/kataras/iris"
+  branch = "master"
+  source = "github.com/kataras/iris"
+
+[[constraint]]
+  name = "github.com/Masterminds/semver"
+  version = "1.4.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/gorilla/http"
+
+[[constraint]]
+  name = "github.com/iris-contrib/middleware"
+  version = "10.0.0"

@@ -1,0 +1,42 @@
+<div class="etcd-group">
+    <div class="inner">
+        <div class="block block-copy">
+            <button class="backup-box_create" mat-raised-button color="primary" (click)="createBackup();">{{localService.BACKUP_OP_SUBMIT}}</button>
+            <mat-table class="backup-box_info" [dataSource]="dataSource">
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                    <mat-header-cell *matHeaderCellDef> {{localService.BACKUP_COLUMN_NAME}} </mat-header-cell>
+                    <mat-cell *matCellDef="let row"> 
+                        <a href="/api/v1/cluster/backup?name={{ row.name }}" target="_blank"> {{ row.name }} </a>
+                    </mat-cell>
+                </ng-container>
+
+                <!-- Size Column -->
+                <ng-container matColumnDef="size">
+                    <mat-header-cell *matHeaderCellDef> {{localService.BACKUP_COLUMN_SIZE}} </mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.size }} </mat-cell>
+                </ng-container>
+
+                <!-- CreateTime Column -->
+                <ng-container matColumnDef="createTime">
+                    <mat-header-cell *matHeaderCellDef> {{localService.BACKUP_COLUMN_CREATE_TIME}} </mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.createTime }} </mat-cell>
+                </ng-container>
+
+                <!-- Ops Column -->
+                <ng-container matColumnDef="ops">
+                    <mat-header-cell *matHeaderCellDef> {{localService.BACKUP_COLUMN_OPS}} </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        <button mat-button color="warn" (click)="deleteBackup(row.name);">{{localService.BACKUP_OP_DELETE}}</button>
+                    </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+            </mat-table>
+        </div>
+    </div>
+</div>
+<div class="backup-box_loading-shade" *ngIf="isLoadingResults">
+    <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
+</div>

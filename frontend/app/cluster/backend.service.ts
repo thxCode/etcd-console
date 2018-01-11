@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { Http, Response, URLSearchParams, Headers, RequestOptions, RequestOptionsArgs, ResponseContentType } from '@angular/http';
 import { Observable } from 'rxjs';
 import 'rxjs/Rx';
 import * as _ from 'lodash';
@@ -21,17 +21,19 @@ export class Coordinate {
 }
 
 // MemberStatus defines etcd node status.
-export class MemberStatus {
-  Name: string;
-  ID: string;
-  Endpoint: string;
+export class MemberStatusResponse {
+  name: string;
+  id: string;
+  endpoint: string;
 
-  IsLeader: boolean;
-  State: string;
+  isLeader: boolean;
+  isHealth: boolean;
+  isConnected: boolean;
 
-  DBSize: number;
-  Version: string;
+  dbSize: string;
+  version: string;
 
+  state: string;
   circleCoord: Coordinate;
   txtCoord: Coordinate;
 
@@ -40,42 +42,56 @@ export class MemberStatus {
     id: string,
     endpoint: string,
     isLeader: boolean,
+    isHealth: boolean,
+    isConnected: boolean,
     dbSize: number,
     version: string,
     circleCoord: Coordinate,
     txtCoord: Coordinate
   ) {
-    this.Name = name;
-    this.ID = id;
-    this.Endpoint = endpoint;
+    this.name = name;
+    this.id = id;
+    this.endpoint = endpoint;
 
-    this.IsLeader = isLeader;
+    this.isLeader = isLeader;
+    this.isHealth = isHealth;
+    this.isConnected = isConnected;
+    
+    this.dbSize = _.toString(dbSize);
+    this.version = version;
 
-    this.DBSize = dbSize;
-    this.Version = version;
-
-    if (isLeader) {
-      this.State = 'Leader'
+    if (isConnected) {
+      if (isHealth) {
+        if (isLeader) {
+          this.state = 'Leader'
+        } else {
+          this.state = 'Follower'
+        }
+      } else {
+        this.state = 'Stopped'
+      }
     } else {
-      this.State = 'Follower'
+       this.state = 'Losted'
     }
-
     this.circleCoord = circleCoord;
     this.txtCoord = txtCoord;
   }
 
-  toString() {
-    return this.Name;
-  }
 }
 
-export class StatusCluster {
-  Members: MemberStatus[]
+export class BackupResponse {
+  name: string;
+  size: string;
+  createTime: string;
 
   constructor(
-    members: MemberStatus[]
+    name: string,
+    size: number,
+    createTime: string
   ) {
-    this.Members = members;
+    this.name = name;
+    this.size = _.toString(size);
+    this.createTime = createTime;
   }
 }
 
@@ -84,49 +100,119 @@ const DISTANCE = 1500;
 @Injectable()
 export class BackendService {
   private endpoints = {
-    status: 'cluster/status',
-    backup: 'cluster/backup'
+    status: '/api/v1/cluster/status',
+    backup: '/api/v1/cluster/backup'
   }
 
-  clusterStatus: StatusCluster;
+  memberStatuses: MemberStatusResponse[];
+  backups: BackupResponse[];
 
   constructor(private http: Http) {
-    this.clusterStatus = new StatusCluster([]);
+    this.memberStatuses = [];
+    this.backups = [];
+  }
+
+  private processHTTPErrorCluster(error: any) {
+    let errMsg = (error.message) ? error.message :
+      error.status ? `${error.status} - ${error.statusText}` : 'Server error';
+    return Observable.throw(errMsg);
   }
 
   ///////////////////////////////////////////////////////
-  private processHTTPResponseClusterStatus(res: Response) {
+  private processHTTPResponseMemberStatusesRead(res: Response) {
     let responseJson = res.json();
-    if (responseJson.Success && responseJson.Results && responseJson.Results.length >= 1) {
+
+    if (!_.isEmpty(responseJson.members)) {
       let radius = 3500;
-      let members = [];
-      let rad = 2 * Math.PI / responseJson.Results.length;
-      _.forEach(responseJson.Results, (val: any, idx: number) => {
+      let rad = 2 * Math.PI / responseJson.members.length;
+
+      this.memberStatuses.length = 0;
+      _.forEach(responseJson.members, (val: any, idx: number) => {
         let idxRad = rad * idx;
 
         let x = (1 + Math.cos(idxRad)) * radius + DISTANCE;
         let y = (1 - Math.sin(idxRad)) * radius + DISTANCE;
 
-        members.push(new MemberStatus(val.Name, val.ID, val.Endpoint, val.IsLeader, val.DBSize, val.Version, new Coordinate(x, y, 300), new Coordinate(x+300, y+300, 200)))
+        this.memberStatuses.push(new MemberStatusResponse(val.name, val.id, val.endpoint, val.leader, val.health, val.connected, val.dbSize, val.version, new Coordinate(x, y, 300), new Coordinate(x+300, y+300, 200)))
       });
+    }
 
-      return new StatusCluster(members);
+    return this.memberStatuses;
+  }
+
+  fetchMemberStatuses(): Observable<MemberStatusResponse[]> {
+    return this.http.get(
+        this.endpoints.status,
+        new RequestOptions({
+          responseType: ResponseContentType.Json
+        })
+      )
+      .map(this.processHTTPResponseMemberStatusesRead.bind(this))
+      .catch(this.processHTTPErrorCluster);
+  }
+  ///////////////////////////////////////////////////////
+
+  ///////////////////////////////////////////////////////
+  private processHTTPResponseClusterBackupRead(res: Response) {
+    let responseJson = res.json();
+
+    this.backups.length = 0;
+    if (!_.isEmpty(responseJson.backups)) {
+      _.forEach(responseJson.backups, (backup: any) => {
+          this.backups.push(new BackupResponse(backup.name, backup.size, backup.createTime))
+      });
+    }
+
+    return this.backups;
+  }
+
+  fetchClusterBackups(): Observable<BackupResponse[]> {
+    return this.http.get(this.endpoints.backup)
+      .map(this.processHTTPResponseClusterBackupRead.bind(this))
+      .catch(this.processHTTPErrorCluster);
+  }
+  ///////////////////////////////////////////////////////
+
+  ///////////////////////////////////////////////////////
+  removeClusterBackup(name: string): Observable<boolean> {
+    let params = new URLSearchParams();
+    params.append("name", name);
+
+    return this.http.delete(
+        this.endpoints.backup, 
+        new RequestOptions({
+          responseType: ResponseContentType.Json,
+          search: params,
+        })
+      )
+      .catch(this.processHTTPErrorCluster);
+  }
+  ///////////////////////////////////////////////////////
+
+  ///////////////////////////////////////////////////////
+  private processHTTPResponseClusterBackupCreate(res: Response) {
+    let responseJson = res.json();
+
+    if (!_.isEmpty(responseJson.backups)) {
+      let backup = responseJson.backups[0];
+
+      return new BackupResponse(backup.name, backup.size, backup.createTime)
     } else {
-      return this.clusterStatus || {};
+      return Observable.throw("backup error");
     }
   }
 
-  private processHTTPErrorClusterStatus(error: any) {
-    let errMsg = (error.message) ? error.message :
-      error.status ? `${error.status} - ${error.statusText}` : 'Server error';
-    console.error(errMsg);
-    return Observable.throw(errMsg);
-  }
-
-  fetchClusterStatus(): Observable<StatusCluster> {
-    return this.http.get(this.endpoints.status)
-      .map(this.processHTTPResponseClusterStatus)
-      .catch(this.processHTTPErrorClusterStatus);
+  createClusterBackup(): Observable<BackupResponse> {
+    return this.http.post(
+        this.endpoints.backup, 
+        null,
+        new RequestOptions({
+          responseType: ResponseContentType.Json
+        })
+      )
+      .map(this.processHTTPResponseClusterBackupCreate)
+      .catch(this.processHTTPErrorCluster);
   }
   ///////////////////////////////////////////////////////
+
 }
